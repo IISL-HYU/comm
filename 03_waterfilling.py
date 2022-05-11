@@ -34,7 +34,6 @@ while(np.abs(alpha_low-alpha_high) > stop_threshold):
 print(np.sum(np.log(1 + g * p / N0)))
 
 
-
 plt.figure(1)
 plt.bar(range(10), height=N0/g.squeeze(), width=1, label='Channel')
 plt.bar(range(10), height= -1 * p.squeeze(), width=1, bottom=1/alpha, label='Power allocation')
