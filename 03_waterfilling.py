@@ -32,7 +32,7 @@ while(np.abs(alpha_low-alpha_high) > stop_threshold):
     alphas.append(float(alpha))
     caps.append(np.sum(np.log(1 + g * p / N0)))
 # Print the achievable rate in nats/s 
-print(np.sum(np.log(1 + g * p / N0)))
+print(f"rate: {np.sum(np.log(1 + g * p / N0)):2f}BPS/Hz")
 
 
 plt.figure(1)
