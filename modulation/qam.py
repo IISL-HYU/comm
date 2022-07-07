@@ -1,5 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+import sys 
+sys.path.append("../modulation/")
 from modulator import Modulator
 
 class QAM(Modulator):
@@ -61,15 +63,24 @@ class QAM(Modulator):
         return np.array(bitstream_recovered).reshape(-1, 1).squeeze()
 
     def plot_constellation_points(self, ):
-        plt.figure(figsize=(8, 8))
-        for b3 in [0, 1]:
-            for b2 in [0, 1]:
-                for b1 in [0, 1]:
-                    for b0 in [0, 1]:
-                        B = (b3, b2, b1, b0) 
-                        Q = self.mapping[B]
-                        plt.plot(Q.real, Q.imag, 'bo', zorder=10)
-                        plt.text(Q.real, Q.imag+0.1, "".join(str(x) for x in B), ha='center')
+        if self.M == 16:
+            plt.figure(figsize=(8, 8))
+            for b3 in [0, 1]:
+                for b2 in [0, 1]:
+                    for b1 in [0, 1]:
+                        for b0 in [0, 1]:
+                            B = (b3, b2, b1, b0) 
+                            Q = self.mapping[B]
+                            plt.plot(Q.real, Q.imag, 'bo', zorder=10)
+                            plt.text(Q.real, Q.imag+0.1, "".join(str(x) for x in B), ha='center')
+        elif self.M == 4: 
+            for b1 in [0, 1]:
+                for b0 in [0, 1]:
+                    B = (b1, b0)
+                    Q = self.mapping[B]
+                    plt.plot(Q.real, Q.imag, 'bo', zorder=10)
+                    plt.text(Q.real, Q.imag+0.1, "".join(str(x) for x in B), ha='center')
+        
         plt.axis([-1.5, 1.5, -1.5, 1.5])
         plt.grid(True, linestyle="--")
         plt.title(f"Constellation Mapping for {self.M}-QAM")
