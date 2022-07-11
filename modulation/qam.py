@@ -40,7 +40,7 @@ class QAM(Modulator):
             sym = tuple(bits[self.k * i : self.k * (i+1)])
             symstream[i] = self.mapping[sym]
         return symstream
-    
+
     def demodulate(self, symbols: np.ndarray):
             
         symbols *= self.avg_power
@@ -49,9 +49,9 @@ class QAM(Modulator):
         rounds = np.unique(rounds) 
 
         compare = np.subtract.outer(symbols, rounds)
-        s_hat = rounds[np.argmin(abs(compare), axis=1)]
+        self.s_hat = rounds[np.argmin(abs(compare), axis=1)]
 
-        messages_recovered = self.demap(s_hat)
+        messages_recovered = self.demap(self.s_hat)
         return messages_recovered
 
     def demap(self, symbols: np.ndarray):
