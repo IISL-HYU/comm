@@ -120,8 +120,8 @@ if __name__ == "__main__":
     sers_avg_mmse = zf_receiver.run(trials=1, verbose=2) 
 
     plt.figure(figsize=(8, 8))
-    plt.semilogy(zf_receiver.snr_list, sers_avg_zf, '-rs', label='ZF')
-    plt.semilogy(mmse_receiver.snr_list, sers_avg_mmse, '-r*', label='MMSE')
+    plt.semilogy(zf_receiver.snr_list, sers_avg_zf, '-ro', label='ZF', markersize=12, fillstyle='none')
+    plt.semilogy(mmse_receiver.snr_list, sers_avg_mmse, '-r*', label='MMSE', markersize=12)
     plt.grid()
     plt.legend()
     plt.xlabel("SNR")
