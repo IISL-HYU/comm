@@ -24,9 +24,9 @@ class BussgangReceiver(OneBitReceiver):
                 # Received signal (Quantized) 
                 y = np.sign(r.real) + 1j * np.sign(r.imag) 
 
-                A, n = self.decompose(H, snr)
+                A, covn = self.decompose(H, snr)
 
-                x_hat = self.estimate_and_detect(y, A, snr)
+                x_hat = self.estimate_and_detect(y, A, covn)
 
                 ser = 1 - np.sum(np.isclose(x, x_hat)) / (self.T * self.K)
                 sers.append(ser)
@@ -44,15 +44,16 @@ class BussgangReceiver(OneBitReceiver):
         """   
         if len(H.shape) > 2:
             return np.matmul(H, (H.conjugate()).transpose(0, 2, 1)) + \
-                (10 ** (-snr/20)) * (np.eye(self.N) + 1j * np.eye(self.N)) * np.ones(shape=(self.T, self.N, self.N))
+                (10 ** (-snr/20)) * (np.eye(self.N)) * np.ones(shape=(self.T, self.N, self.N))
         else: 
             return np.matmul(H, (H.conjugate()).T) + \
-                (10**(-snr/20))*(np.eye(self.N) + 1j * np.eye(self.N))
+                (10**(-snr/20))*(np.eye(self.N))
 
     def decompose(self, H, snr):
         sigma_r = self.cov_r(H, snr)
         diag_sigma = sigma_r * ((np.eye(self.N) * np.ones(shape=(self.T, self.N, self.N))))
-        sqrt_diag_sigma = np.sqrt(np.linalg.inv(diag_sigma))
+        inv_diag_sigma = np.linalg.inv(diag_sigma)
+        sqrt_diag_sigma = np.sqrt(inv_diag_sigma)
 
         # 1. Calculate the effective channel
         self.V = sqrt_diag_sigma * np.sqrt(2 / np.pi) 
@@ -60,10 +61,10 @@ class BussgangReceiver(OneBitReceiver):
         
         # 2. Calculate the effective noise 
         lhs = np.matmul(sqrt_diag_sigma, sigma_r) 
-        rhs1 = np.matmul(lhs, sqrt_diag_sigma)
+        rhs1 = np.matmul(lhs, sqrt_diag_sigma) * 0.9999 # for preventing nan 
         lhs = np.arcsin(rhs1.real) + 1j * np.arcsin(rhs1.imag) 
 
-        rhs = rhs1 - (10 ** (-snr/20)) * diag_sigma
+        rhs = rhs1 - (10 ** (-snr/20)) * inv_diag_sigma
         effective_noise_covariance = np.sqrt(2 / np.pi) * (lhs-rhs) 
 
         return effective_channel, effective_noise_covariance
@@ -78,15 +79,15 @@ if __name__ == "__main__":
     hparam_config["N"] = 16
     hparam_config["M"] = 4 
     hparam_config["T"] = int(1e5)
-    hparam_config["estimator"] = zf
+    hparam_config["estimator"] = bmmse
     hparam_config["detector"] = symbol_by_symbol
     bzf_receiver = BussgangReceiver(hparam_config=hparam_config)
     
     sers_avg_zf = bzf_receiver.run(trials=1, verbose=2) 
    
 
-    plt.figure(figsize=(8, 8))
-    plt.semilogy(bzf_receiver.snr_list, sers_avg_zf, '-ro', label='ZF', markersize=12, fillstyle='none')
+    plt.figure(figsize=(9, 8))
+    plt.semilogy(bzf_receiver.snr_list, sers_avg_zf, '-ko', label='BZF', markersize=12, fillstyle='none')
 
     plt.grid()
     plt.legend()
