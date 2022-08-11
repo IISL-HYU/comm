@@ -1,6 +1,7 @@
 
 import numpy as np 
 import matplotlib.pyplot as plt 
+import os 
 
 from one_bit_receiver import OneBitReceiver
 from detector import * 
@@ -73,7 +74,9 @@ class BussgangReceiver(OneBitReceiver):
         
 
 if __name__ == "__main__":
+    sers_avg_zf = np.load('./results/sers_avg_bmmse.npy')
 
+    save_dir = './results/'
     hparam_config = dict() 
     hparam_config["K"] = 2
     hparam_config["N"] = 16
@@ -83,8 +86,10 @@ if __name__ == "__main__":
     hparam_config["detector"] = symbol_by_symbol
     bzf_receiver = BussgangReceiver(hparam_config=hparam_config)
     
-    sers_avg_zf = bzf_receiver.run(trials=1, verbose=2) 
-   
+    sers_avg_zf += bzf_receiver.run(trials=1, verbose=2) 
+    sers_avg_zf /= 2
+    
+    np.save(save_dir + 'sers_avg_bmmse.npy', sers_avg_zf)
 
     plt.figure(figsize=(9, 8))
     plt.semilogy(bzf_receiver.snr_list, sers_avg_zf, '-ko', label='BZF', markersize=12, fillstyle='none')
