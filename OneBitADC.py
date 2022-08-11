@@ -12,6 +12,7 @@ import random
 import os 
 from estimator import *
 from detector import *
+from modem import * 
 
 
 class OneBitReceiver():
@@ -31,7 +32,7 @@ class OneBitReceiver():
         self.snr_list = np.arange(snr_min, snr_max+1, snr_gap)
 
         # 4-qam (QPSK) modulation 
-        self.symbols = self.modem()
+        self.symbols = modem(self.M)
 
         # Make symbol space for K-users for in case of ML detection
         self.symbol_space = make_symbol_space(M=self.M, K=self.K, constellation_points=self.symbols)
@@ -115,8 +116,8 @@ if __name__ == "__main__":
     hparam_config["estimator"] = mmse
     mmse_receiver = OneBitReceiver(hparam_config=hparam_config)
 
-    sers_avg_zf = zf_receiver.run(trials=10, verbose=2) 
-    sers_avg_mmse = zf_receiver.run(trials=10, verbose=2) 
+    sers_avg_zf = zf_receiver.run(trials=1, verbose=2) 
+    sers_avg_mmse = zf_receiver.run(trials=1, verbose=2) 
 
     plt.figure(figsize=(8, 8))
     plt.semilogy(zf_receiver.snr_list, sers_avg_zf, '-rs', label='ZF')
