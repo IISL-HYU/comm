@@ -34,13 +34,14 @@ class OneBitReceiver():
         self.symbols = self.modem()
 
         # Make symbol space for K-users for in case of ML detection
-        self.symbol_space = self.make_symbol_space()
+        self.symbol_space = make_symbol_space(M=self.M, K=self.K, constellation_points=self.symbols)
 
         # select estimator
-        self.estimator = zf 
-        self.detector = symbol_by_symbol
+        self.estimator = hparam_config.get("estimator", zf)
+        self.detector = hparam_config.get("detector", symbol_by_symbol)
 
     def run(self, trials=1, verbose=0):
+        sers_avg = np.zeros_like(self.snr_list, dtype=np.float64)
         for t in range(trials):
             sers = []
             print("_" * 100)
@@ -58,23 +59,11 @@ class OneBitReceiver():
                 sers.append(ser)
                 if verbose == 2:
                     print("snr: ", snr, f"ser: {ser:.2e}")
-
+            sers_avg += np.array(sers)
             if verbose == 1:
                 print("length of x:", len(x))
                 print("Shape of H, x, z, r, y", H.shape, x.shape, z.shape, r.shape, y.shape)
-            print("sers wrt snrs: ", sers)
-
-
-    def estimate_and_detect(self, y, H, snr):
-        x_tilde = self.estimate(y, H, snr)
-        x_hat = self.detect(x_tilde)
-        return x_hat 
-
-    def estimate(self, y, H, snr):
-        return np.matmul(self.estimator(H, snr), y)
-
-    def detect(self, x_tilde):
-        return self.detector(x_tilde, self.symbols)
+        return sers_avg / trials
 
     def pass_channel(self, snr):
         
@@ -100,11 +89,17 @@ class OneBitReceiver():
             constellation_points /= np.sqrt(10) 
         return constellation_points 
 
-    def make_symbol_space(self,):
-        # make symbol space for ML detection
-        index_space = np.indices([self.M for _ in range(self.K)]).reshape(self.K, -1).T 
-        symbol_space = np.take(self.symbols, index_space)
-        return symbol_space 
+    def estimate_and_detect(self, y, H, snr):
+        x_tilde = self.estimate(y, H, snr)
+        x_hat = self.detect(x_tilde)
+        return x_hat 
+
+    def estimate(self, y, H, snr):
+        return np.matmul(self.estimator(H, snr), y)
+
+    def detect(self, x_tilde):
+        return self.detector(x_tilde, self.symbols)
+
 
 
 if __name__ == "__main__":
@@ -113,9 +108,23 @@ if __name__ == "__main__":
     hparam_config["N"] = 16
     hparam_config["M"] = 4 
     hparam_config["T"] = int(1e5)
+    hparam_config["estimator"] = zf
+    hparam_config["detector"] = symbol_by_symbol
+    zf_receiver = OneBitReceiver(hparam_config=hparam_config)
     
-    receiver = OneBitReceiver(hparam_config=hparam_config)
-    print(len(receiver.symbol_space))
-    print(receiver.symbols)
+    hparam_config["estimator"] = mmse
+    mmse_receiver = OneBitReceiver(hparam_config=hparam_config)
 
-    receiver.run(verbose=2) 
+    sers_avg_zf = zf_receiver.run(trials=10, verbose=2) 
+    sers_avg_mmse = zf_receiver.run(trials=10, verbose=2) 
+
+    plt.figure(figsize=(8, 8))
+    plt.semilogy(zf_receiver.snr_list, sers_avg_zf, '-rs', label='ZF')
+    plt.semilogy(mmse_receiver.snr_list, sers_avg_mmse, '-r*', label='MMSE')
+    plt.grid()
+    plt.legend()
+    plt.xlabel("SNR")
+    plt.ylabel("SER")
+    plt.title("symbol error rate")
+    plt.yticks([1e-0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5])
+    plt.show()
