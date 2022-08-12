@@ -13,9 +13,15 @@ def qfunc(x: np.ndarray, type='bpsk'):
     return result
 
 def is_pos_def(mat):
+    """
+    Function that tells if a matrix is positive (semi)definite
+    """
     return np.all(np.linalg.eigvals(mat) >= 0)
 
-def phi(z):
+def phi(z: np.ndarray):
+    """
+    CDF of normal distribution
+    """
     return (1/2) * (1 + erf(z / np.sqrt(2)))
 
     
