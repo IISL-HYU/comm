@@ -10,9 +10,10 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import random
 import os 
-from estimator import *
-from detector import *
-from modem import * 
+
+from util.detector import *
+from util.estimator import *
+from util.modem import * 
 
 
 class OneBitReceiver():

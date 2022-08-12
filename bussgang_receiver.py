@@ -4,9 +4,9 @@ import matplotlib.pyplot as plt
 import os 
 
 from one_bit_receiver import OneBitReceiver
-from detector import * 
-from estimator import * 
-from modem import * 
+from util.detector import * 
+from util.estimator import * 
+from util.modem import * 
 
 
 class BussgangReceiver(OneBitReceiver):
