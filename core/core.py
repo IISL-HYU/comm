@@ -11,7 +11,10 @@ def qfunc(x: np.ndarray, type='bpsk'):
         result = np.array([1/2 * np.math.erfc(i/np.sqrt(2)) for i in x])
     return result
 
+def is_pos_def(mat):
+    return np.all(np.linalg.eigvals(mat) >= 0)
 
+    
 # def compute_ser(qfuncs: np.ndarray, type='bpsk'):
 #     type_available = ('bpsk', 'qpsk', '16-qam')
 
