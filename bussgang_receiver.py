@@ -82,11 +82,11 @@ if __name__ == "__main__":
     hparam_config["N"] = 16
     hparam_config["M"] = 4 
     hparam_config["T"] = int(1e5)
-    hparam_config["estimator"] = bmmse
+    hparam_config["estimator"] = zf
     hparam_config["detector"] = symbol_by_symbol
     bzf_receiver = BussgangReceiver(hparam_config=hparam_config)
     
-    sers_avg_zf += bzf_receiver.run(trials=10, verbose=2) 
+    sers_avg_zf += bzf_receiver.run(trials=1, verbose=2) 
     sers_avg_zf /= 2
     
     np.save(save_dir + 'sers_avg_bmmse.npy', sers_avg_zf)
