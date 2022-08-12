@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special import erf
 
 
 
@@ -13,6 +14,9 @@ def qfunc(x: np.ndarray, type='bpsk'):
 
 def is_pos_def(mat):
     return np.all(np.linalg.eigvals(mat) >= 0)
+
+def phi(z):
+    return (1/2) * (1 + erf(z / np.sqrt(2)))
 
     
 # def compute_ser(qfuncs: np.ndarray, type='bpsk'):
