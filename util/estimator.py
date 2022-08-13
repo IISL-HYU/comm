@@ -3,9 +3,11 @@
 import numpy as np 
 
 def zf(H, snr):
+    """Zero-Forcing estimator : takes an inverse of the Channel Gain and then multiply"""
     return np.linalg.pinv(H)
 
 def mmse(H, snr):
+    """Minimum Mean Squared Error  estimation : can be induced by Orthogonality principle of estimation theory"""
     T = H.shape[0]
     K = H.shape[-1]
     if type(snr) == int:
@@ -17,6 +19,7 @@ def mmse(H, snr):
     return estimator
 
 def bmmse(H, snr):
+    """Bussgang decomposed mmse estimator : for 1-bit-ADC"""
     T = H.shape[0]
     N = H.shape[1]
 
