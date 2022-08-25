@@ -1,4 +1,5 @@
 import numpy as np
+import os 
 from scipy.special import erf
 
 
@@ -36,3 +37,26 @@ def phi(z: np.ndarray):
 #         result = 1-(1-(3/2)*qfuncs)**2
 #     result = np.average(result)
 #     return result
+
+def loadf(fname: str, load_dir='./results/'):
+    if load_dir == None:    
+        load_dir = "./results/"
+    fname = fname
+    fdir = os.path.join(load_dir, fname)
+    print("\t", fdir)
+    return np.load(fdir)
+    
+def get_all_results(load_dir='./results/'):
+    fnames = None 
+    for dir_path, dir_names, fname in os.walk(load_dir):
+        fnames = fname
+    return fnames 
+
+def load_all_results(load_dir='./results/'):
+    """
+    loads all results and returns its name and value 
+    """
+    results_key = get_all_results()
+    print("results from directory: ")
+    results_value = [loadf(i) for i in results_key]
+    return results_key, results_value
