@@ -10,8 +10,7 @@ def mmse(H, snr):
     """Minimum Mean Squared Error  estimation : can be induced by Orthogonality principle of estimation theory"""
     T = H.shape[0]
     K = H.shape[-1]
-    if type(snr) == int:
-        estimator = np.matmul((H.conjugate()).transpose(0, 2, 1), H) + (10**(-snr/20)) * ((np.eye(K) + 1j * np.eye(K)) * np.ones(shape=(T, K, K)))
+    estimator = np.matmul((H.conjugate()).transpose(0, 2, 1), H) + (10**(-snr/20)) * ((np.eye(K) + 1j * np.eye(K)) * np.ones(shape=(T, K, K)))
     if type(snr) == np.ndarray:
         estimator = np.matmul((H.conjugate()).transpose(0, 2, 1), H) + snr 
     estimator = np.linalg.inv(estimator)

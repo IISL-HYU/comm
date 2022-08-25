@@ -109,20 +109,23 @@ if __name__ == "__main__":
     hparam_config["K"] = 2
     hparam_config["N"] = 16
     hparam_config["M"] = 4 
-    hparam_config["T"] = int(1e5)
+    hparam_config["T"] = int(1e4)
     hparam_config["estimator"] = zf
     hparam_config["detector"] = symbol_by_symbol
+    hparam_config["snr_min"] = -10
+    hparam_config["snr_max"] = 30
     zf_receiver = OneBitReceiver(hparam_config=hparam_config)
     
-    hparam_config["estimator"] = mmse
-    mmse_receiver = OneBitReceiver(hparam_config=hparam_config)
+    # hparam_config["estimator"] = mmse
+    # mmse_receiver = OneBitReceiver(hparam_config=hparam_config)
 
-    sers_avg_zf = zf_receiver.run(trials=1, verbose=2) 
-    sers_avg_mmse = zf_receiver.run(trials=1, verbose=2) 
+    sers_avg_zf = zf_receiver.run(trials=100, verbose=2) 
+    # sers_avg_mmse = zf_receiver.run(trials=1, verbose=2) 
 
     plt.figure(figsize=(8, 8))
     plt.semilogy(zf_receiver.snr_list, sers_avg_zf, '-ro', label='ZF', markersize=12, fillstyle='none')
-    plt.semilogy(mmse_receiver.snr_list, sers_avg_mmse, '-r*', label='MMSE', markersize=12)
+    # plt.semilogy(mmse_receiver.snr_list, sers_avg_mmse, '-r*', label='MMSE', markersize=12)
+
     plt.grid()
     plt.legend()
     plt.xlabel("SNR")
