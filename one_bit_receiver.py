@@ -43,6 +43,9 @@ class OneBitReceiver():
         self.detector = hparam_config.get("detector", symbol_by_symbol)
 
     def run(self, trials=1, verbose=0):
+        """
+        Function that runs for `trials` time blocks 
+        """
         sers_avg = np.zeros_like(self.snr_list, dtype=np.float64)
         for t in range(trials):
             sers = []
@@ -68,7 +71,10 @@ class OneBitReceiver():
         return sers_avg / trials
 
     def pass_channel(self, snr):
-        
+        """
+        Rayleigh fadinig channel for MIMO with T timesteps
+        """
+
         x = np.random.randint(0, self.M, size=self.K*self.T).reshape(self.T, self.K, 1)
         x = np.take(self.symbols, x)
         # Channel 

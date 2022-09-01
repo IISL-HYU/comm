@@ -74,22 +74,24 @@ class BussgangReceiver(OneBitReceiver):
         
 
 if __name__ == "__main__":
-    sers_avg_zf = np.load('./results/sers_avg_bmmse.npy')
+    # sers_avg_zf = np.load('./results/sers_avg_bmmse.npy')
 
     save_dir = './results/'
     hparam_config = dict() 
     hparam_config["K"] = 2
     hparam_config["N"] = 16
     hparam_config["M"] = 4 
-    hparam_config["T"] = int(1e5)
+    hparam_config["T"] = int(1e4)
+    hparam_config["snr_min"] = -10
+    hparam_config["snr_max"] = 30
     hparam_config["estimator"] = zf
     hparam_config["detector"] = symbol_by_symbol
     bzf_receiver = BussgangReceiver(hparam_config=hparam_config)
     
-    sers_avg_zf += bzf_receiver.run(trials=1, verbose=2) 
-    sers_avg_zf /= 2
+    sers_avg_zf = np.zeros_like(bzf_receiver.snr_list, dtype=np.float64)
+    sers_avg_zf += bzf_receiver.run(trials=100, verbose=2) 
     
-    np.save(save_dir + 'sers_avg_bmmse.npy', sers_avg_zf)
+    np.save(save_dir + 'sers_avg_bzf.npy', sers_avg_zf[:-1])
 
     plt.figure(figsize=(9, 8))
     plt.semilogy(bzf_receiver.snr_list, sers_avg_zf, '-ko', label='BZF', markersize=12, fillstyle='none')
